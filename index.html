@@ -5,392 +5,612 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="DriftWatch — predicting the performance degradation of deployed models from unlabeled input data. CMPE 490, TED University, Fall 2026.">
 <title>DriftWatch</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap">
 <style>
-  /* Layout: hero, then stacked content bands; deliverables run as a status timeline down the left rail. */
   :root {
-    --bg: #ffffff;
-    --bg-alt: #f6f8f8;
+    --bg: #fdfcf9;
+    --bg-alt: #f5f3ee;
     --surface: #ffffff;
-    --line: #dfe5e5;
-    --fg: #16201f;
-    --fg-soft: #5a6a69;
-    --accent: #0d9488;
-    --accent-deep: #0b7d73;
-    --accent-wash: #e6f4f2;
-    --done: #0d9488;
-    --active: #b45309;
-    --active-wash: #fdf2e2;
-    --sans: "IBM Plex Sans", system-ui, sans-serif;
-    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --line: #e7e3da;
+    --fg: #1d2433;
+    --fg-soft: #5d6577;
+    --primary: #3451c7;
+    --primary-soft: #eaeefc;
+    --coral: #e8603c;
+    --coral-soft: #fdece6;
+    --teal: #0f9d8a;
+    --teal-soft: #e2f5f1;
+    --amber: #d9930d;
+    --amber-soft: #fcf3dc;
+    --violet: #8250c4;
+    --violet-soft: #f1eafb;
+    --hero-a: #dfe6ff;
+    --hero-b: #ffe6da;
+    --hero-c: #d9f3ec;
+    --shadow: 0 1px 2px rgba(29,36,51,.04), 0 6px 20px rgba(29,36,51,.06);
+    --serif: "Source Serif 4", Georgia, serif;
+    --sans: "Inter", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
   }
-
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #0e1413;
-      --bg-alt: #131b1a;
-      --surface: #16201f;
-      --line: #273332;
-      --fg: #e6eceb;
-      --fg-soft: #93a3a1;
-      --accent: #2dd4bf;
-      --accent-deep: #5eead4;
-      --accent-wash: #11302c;
-      --done: #2dd4bf;
-      --active: #e8a33d;
-      --active-wash: #2e2410;
+      --bg: #11141c; --bg-alt: #161a24; --surface: #1b2030; --line: #2a3144;
+      --fg: #e8ebf2; --fg-soft: #a1a9bb;
+      --primary: #8ea2ff; --primary-soft: #232c4d;
+      --coral: #ff8a66; --coral-soft: #3a2420;
+      --teal: #3fd1bb; --teal-soft: #15302c;
+      --amber: #f2b84b; --amber-soft: #342a14;
+      --violet: #b892f0; --violet-soft: #2c2340;
+      --hero-a: #1d2547; --hero-b: #3a2423; --hero-c: #133029;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
       color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-    --bg: #0e1413;
-    --bg-alt: #131b1a;
-    --surface: #16201f;
-    --line: #273332;
-    --fg: #e6eceb;
-    --fg-soft: #93a3a1;
-    --accent: #2dd4bf;
-    --accent-deep: #5eead4;
-    --accent-wash: #11302c;
-    --done: #2dd4bf;
-    --active: #e8a33d;
-    --active-wash: #2e2410;
+    --bg: #11141c; --bg-alt: #161a24; --surface: #1b2030; --line: #2a3144;
+    --fg: #e8ebf2; --fg-soft: #a1a9bb;
+    --primary: #8ea2ff; --primary-soft: #232c4d;
+    --coral: #ff8a66; --coral-soft: #3a2420;
+    --teal: #3fd1bb; --teal-soft: #15302c;
+    --amber: #f2b84b; --amber-soft: #342a14;
+    --violet: #b892f0; --violet-soft: #2c2340;
+    --hero-a: #1d2547; --hero-b: #3a2423; --hero-c: #133029;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.25);
     color-scheme: dark;
   }
 
+  * { box-sizing: border-box; }
   body {
     margin: 0;
     background: var(--bg);
     color: var(--fg);
     font-family: var(--sans);
-    font-size: 16px;
-    line-height: 1.62;
+    font-size: 16.5px;
+    line-height: 1.68;
     -webkit-font-smoothing: antialiased;
   }
+  a { color: var(--primary); }
 
-  .band { width: 100%; }
-  .band.alt { background: var(--bg-alt); border-block: 1px solid var(--line); }
-  .inner {
-    max-width: 880px;
+  .wrap {
+    max-width: 920px;
     margin: 0 auto;
-    padding-left: max(16px, env(safe-area-inset-left, 0px));
-    padding-right: max(16px, env(safe-area-inset-right, 0px));
-    padding-block: 58px;
+    padding-left: max(18px, env(safe-area-inset-left, 0px));
+    padding-right: max(18px, env(safe-area-inset-right, 0px));
   }
-  .inner.hero { padding-block: 76px 64px; }
+  section { padding-block: 64px; }
+  section.alt { background: var(--bg-alt); }
 
-  .eyebrow {
-    font-family: var(--mono);
-    font-size: 11.5px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin: 0 0 16px;
+  /* ---------- hero ---------- */
+  header.hero {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    padding-block: 84px 56px;
+    background:
+      radial-gradient(600px 320px at 12% 10%, var(--hero-a), transparent 70%),
+      radial-gradient(520px 300px at 90% 18%, var(--hero-b), transparent 70%),
+      radial-gradient(560px 300px at 50% 110%, var(--hero-c), transparent 70%),
+      var(--bg);
   }
-
+  .venue {
+    display: inline-block;
+    font-family: var(--mono); font-size: 12px; letter-spacing: .08em;
+    color: var(--primary); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 100px;
+    padding: 5px 14px; margin-bottom: 26px;
+  }
   h1 {
-    font-size: clamp(42px, 9vw, 68px);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1;
-    margin: 0 0 18px;
+    font-family: var(--serif);
+    font-size: clamp(46px, 9vw, 74px);
+    font-weight: 700; letter-spacing: -.02em; line-height: 1.02;
+    margin: 0 0 14px;
   }
-  .tagline {
-    font-size: clamp(18px, 3.4vw, 22px);
-    color: var(--fg-soft);
-    max-width: 30ch;
-    margin: 0 0 30px;
+  h1 .w { color: var(--primary); }
+  .subtitle {
+    font-family: var(--serif);
+    font-size: clamp(19px, 3.2vw, 25px);
+    font-weight: 500; line-height: 1.35;
+    max-width: 34ch; margin: 0 auto 30px;
     text-wrap: balance;
   }
+  .authors { font-size: 17px; margin: 0 0 4px; }
+  .authors strong { font-weight: 600; }
+  .authors .sup { color: var(--fg-soft); }
+  .affil { color: var(--fg-soft); font-size: 15px; margin: 0 0 30px; }
 
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-weight: 600; font-size: 15px; text-decoration: none;
+    border-radius: 100px; padding: 11px 20px;
+    border: 1px solid transparent;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+  .btn svg { width: 17px; height: 17px; flex: 0 0 auto; }
+  .btn.primary { background: var(--fg); color: var(--bg); }
+  .btn.ghost { background: var(--surface); color: var(--fg); border-color: var(--line); }
+  .btn .fmt { font-family: var(--mono); font-size: 11px; font-weight: 500; opacity: .7; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 30px; }
   .chip {
-    font-family: var(--mono);
-    font-size: 11.5px;
-    letter-spacing: 0.04em;
-    color: var(--fg-soft);
-    border: 1px solid var(--line);
-    border-radius: 100px;
-    padding: 5px 12px;
-    background: var(--surface);
+    font-size: 13px; font-weight: 500;
+    border-radius: 100px; padding: 4px 13px;
   }
+  .chip.c1 { color: var(--primary); background: var(--primary-soft); }
+  .chip.c2 { color: var(--coral); background: var(--coral-soft); }
+  .chip.c3 { color: var(--teal); background: var(--teal-soft); }
+  .chip.c4 { color: var(--amber); background: var(--amber-soft); }
 
+  /* ---------- teaser figure ---------- */
+  .teaser {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 22px 22px 14px;
+    margin-top: -8px;
+  }
+  .teaser svg { display: block; width: 100%; height: auto; }
+  .teaser text { font-family: var(--sans); font-size: 12px; fill: var(--fg-soft); }
+  .teaser .grid { stroke: var(--line); stroke-width: 1; }
+  .teaser .axis { stroke: var(--fg-soft); stroke-width: 1.2; }
+  .teaser .thr { stroke: var(--coral); stroke-width: 1.4; stroke-dasharray: 5 5; }
+  .teaser .thr-l { fill: var(--coral); font-weight: 600; }
+  .teaser .ln { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+  .teaser .s1 { stroke: var(--primary); } .teaser .f1 { fill: var(--primary); }
+  .teaser .s2 { stroke: var(--teal); }    .teaser .f2 { fill: var(--teal); }
+  .teaser .s3 { stroke: var(--amber); }   .teaser .f3 { fill: var(--amber); }
+  .teaser .lbl { font-weight: 600; font-size: 12.5px; }
+  .teaser .dot { stroke: var(--surface); stroke-width: 2; }
+  figcaption {
+    font-size: 14px; color: var(--fg-soft);
+    border-top: 1px solid var(--line);
+    margin-top: 12px; padding-top: 12px;
+  }
+  figcaption b { color: var(--fg); font-weight: 600; }
+  figure { margin: 0; }
+
+  /* ---------- headings & text ---------- */
+  .kicker {
+    font-family: var(--mono); font-size: 12px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--primary);
+    margin: 0 0 8px;
+  }
   h2 {
-    font-size: clamp(23px, 4vw, 29px);
-    font-weight: 600;
-    letter-spacing: -0.015em;
-    margin: 0 0 16px;
-    text-wrap: balance;
+    font-family: var(--serif);
+    font-size: clamp(26px, 4.4vw, 34px);
+    font-weight: 600; letter-spacing: -.01em; line-height: 1.2;
+    margin: 0 0 18px; text-wrap: balance;
   }
-  h3 { font-size: 17px; font-weight: 600; margin: 0 0 7px; }
-  p { margin: 0 0 15px; max-width: 68ch; }
+  h3 { font-size: 17.5px; font-weight: 600; margin: 0 0 6px; line-height: 1.35; }
+  p { margin: 0 0 15px; }
   p:last-child { margin-bottom: 0; }
-  .soft { color: var(--fg-soft); }
+  .lead { font-size: 18px; color: var(--fg-soft); max-width: 66ch; }
+  .center { text-align: center; }
+  .center .lead { margin-inline: auto; }
+  em { font-style: italic; }
+  code, .term { font-family: var(--mono); font-size: .86em; color: var(--primary); }
 
-  code, .term {
-    font-family: var(--mono);
-    font-size: 0.88em;
-    color: var(--accent-deep);
+  /* ---------- abstract ---------- */
+  .abstract {
+    max-width: 760px; margin: 0 auto;
+    font-size: 17px; text-align: justify; hyphens: auto;
   }
+  .abstract h2 { text-align: center; }
+  @media (max-width: 600px) { .abstract { text-align: left; } }
 
-  /* problem chain */
-  .steps { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
-  .step {
-    display: flex; gap: 15px; align-items: baseline;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-left: 3px solid var(--line);
-    border-radius: 0 4px 4px 0;
-    padding: 13px 17px;
-    min-width: 0;
+  /* ---------- problem chain ---------- */
+  .chain {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+    margin-top: 28px; counter-reset: s;
   }
-  .step:last-child { border-left-color: var(--active); background: var(--active-wash); }
-  .step .n { font-family: var(--mono); font-size: 11.5px; color: var(--fg-soft); flex: 0 0 auto; }
-  .step .x { min-width: 0; }
+  @media (max-width: 760px) { .chain { grid-template-columns: 1fr; } }
+  .link {
+    position: relative;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: 16px 16px 18px;
+    font-size: 15px; line-height: 1.5; min-width: 0;
+  }
+  .link .n {
+    display: inline-grid; place-items: center;
+    width: 28px; height: 28px; border-radius: 50%;
+    font-family: var(--mono); font-size: 12px; font-weight: 500;
+    color: var(--primary); background: var(--primary-soft);
+    margin-bottom: 10px;
+  }
+  .link.hot { border-color: var(--coral); background: var(--coral-soft); }
+  .link.hot .n { color: #fff; background: var(--coral); }
 
-  /* two stages */
-  .stages { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 8px; }
-  @media (max-width: 680px) { .stages { grid-template-columns: 1fr; } }
+  /* ---------- stages ---------- */
+  .stages {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px;
+    align-items: stretch; margin-top: 28px;
+  }
+  .arrow { display: grid; place-items: center; color: var(--fg-soft); }
+  .arrow svg { width: 28px; height: 28px; }
+  @media (max-width: 720px) {
+    .stages { grid-template-columns: 1fr; }
+    .arrow svg { transform: rotate(90deg); }
+  }
   .stage {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: 5px;
-    padding: 22px;
-    min-width: 0;
-    display: flex; flex-direction: column; gap: 11px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; box-shadow: var(--shadow);
+    padding: 24px; min-width: 0;
+    display: flex; flex-direction: column; gap: 10px;
+    border-top: 4px solid var(--primary);
   }
+  .stage.field { border-top-color: var(--teal); }
   .stage .lbl {
-    font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--accent);
+    align-self: flex-start;
+    font-family: var(--mono); font-size: 11.5px; font-weight: 500; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--primary); background: var(--primary-soft);
+    border-radius: 100px; padding: 3px 11px;
   }
+  .stage.field .lbl { color: var(--teal); background: var(--teal-soft); }
   .stage p { font-size: 15px; color: var(--fg-soft); margin: 0; }
   .stage .res {
-    font-family: var(--mono); font-size: 12px; color: var(--accent-deep);
-    background: var(--accent-wash); border-radius: 3px; padding: 9px 11px; margin-top: auto;
+    margin-top: auto; font-weight: 600; font-size: 14.5px; color: var(--fg);
+    border-top: 1px dashed var(--line); padding-top: 12px;
   }
+  .stage .res span { color: var(--primary); }
+  .stage.field .res span { color: var(--teal); }
 
-  /* research questions */
-  .rqs { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
-  .rq { display: flex; gap: 15px; min-width: 0; }
+  .insight {
+    margin-top: 30px;
+    background: linear-gradient(120deg, var(--primary-soft), var(--teal-soft));
+    border-radius: 14px; padding: 24px 26px;
+    font-family: var(--serif); font-size: clamp(18px, 2.6vw, 21px); line-height: 1.5;
+  }
+  .insight em { font-style: italic; color: var(--primary); font-weight: 600; }
+
+  /* ---------- research questions ---------- */
+  .rqs { display: grid; gap: 14px; margin-top: 24px; }
+  .rq {
+    display: grid; grid-template-columns: auto 1fr; gap: 18px; align-items: start;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: 18px 20px; min-width: 0;
+  }
   .rq .k {
-    font-family: var(--mono); font-size: 12.5px; color: var(--accent);
-    flex: 0 0 auto; padding-top: 2px;
+    font-family: var(--serif); font-weight: 700; font-size: 20px; line-height: 1;
+    border-radius: 10px; padding: 10px 12px;
   }
-  .rq span:last-child { min-width: 0; }
+  .rq:nth-child(1) .k { color: var(--primary); background: var(--primary-soft); }
+  .rq:nth-child(2) .k { color: var(--teal); background: var(--teal-soft); }
+  .rq:nth-child(3) .k { color: var(--coral); background: var(--coral-soft); }
+  .rq p { margin: 0; min-width: 0; padding-top: 4px; }
 
-  .pull {
-    border-left: 3px solid var(--accent);
-    padding: 4px 0 4px 20px;
-    margin: 26px 0 0;
-    font-size: 17px;
+  .metrics { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+  .metric {
+    flex: 1 1 200px;
+    border: 1px solid var(--line); border-radius: 12px;
+    padding: 14px 16px; background: var(--surface);
   }
+  .metric b { display: block; font-size: 15px; }
+  .metric span { font-size: 14px; color: var(--fg-soft); }
 
-  /* deliverables */
-  .track { display: flex; flex-direction: column; gap: 0; margin-top: 10px; }
-  .item {
-    display: grid;
-    grid-template-columns: 112px 1fr auto;
-    gap: 18px;
-    align-items: baseline;
-    padding: 15px 0;
-    border-bottom: 1px solid var(--line);
-    min-width: 0;
+  /* ---------- contributions ---------- */
+  .contrib { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 24px; }
+  @media (max-width: 760px) { .contrib { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 22px; min-width: 0;
   }
-  .item:first-child { border-top: 1px solid var(--line); }
-  .item .when {
-    font-family: var(--mono); font-size: 12px; color: var(--fg-soft);
-    font-variant-numeric: tabular-nums;
+  .card .ic {
+    width: 40px; height: 40px; border-radius: 10px;
+    display: grid; place-items: center; margin-bottom: 14px;
   }
-  .item .what { min-width: 0; font-weight: 500; }
-  .item .what small { display: block; font-weight: 400; font-size: 13.5px; color: var(--fg-soft); margin-top: 2px; }
+  .card .ic svg { width: 21px; height: 21px; }
+  .card:nth-child(1) .ic { background: var(--primary-soft); color: var(--primary); }
+  .card:nth-child(2) .ic { background: var(--teal-soft); color: var(--teal); }
+  .card:nth-child(3) .ic { background: var(--violet-soft); color: var(--violet); }
+  .card p { font-size: 15px; color: var(--fg-soft); margin: 0; }
+  .note { margin-top: 18px; font-size: 15px; color: var(--fg-soft); }
+
+  /* ---------- deliverables timeline ---------- */
+  .timeline { position: relative; margin-top: 26px; padding-left: 30px; }
+  .timeline::before {
+    content: ""; position: absolute; left: 8px; top: 8px; bottom: 8px;
+    width: 2px; background: var(--line); border-radius: 2px;
+  }
+  .ev { position: relative; padding: 0 0 22px; }
+  .ev:last-child { padding-bottom: 0; }
+  .ev::before {
+    content: ""; position: absolute; left: -28px; top: 7px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--line);
+  }
+  .ev.done::before { background: var(--teal); border-color: var(--teal); }
+  .ev.now::before { background: var(--amber); border-color: var(--amber); box-shadow: 0 0 0 5px var(--amber-soft); }
+  .ev-row {
+    display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: baseline;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: 13px 18px;
+  }
+  .ev .when { font-family: var(--mono); font-size: 12.5px; color: var(--fg-soft); min-width: 104px; }
+  .ev .what { flex: 1 1 260px; min-width: 0; font-weight: 600; }
+  .ev .what small { display: block; font-weight: 400; font-size: 14px; color: var(--fg-soft); }
+  .ev .what a { font-family: var(--mono); font-size: 12px; font-weight: 500; margin-left: 8px; text-decoration: none; }
+  .ev .what a:hover { text-decoration: underline; }
   .badge {
-    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em;
-    text-transform: uppercase; white-space: nowrap;
-    border-radius: 100px; padding: 4px 11px; border: 1px solid var(--line);
-    color: var(--fg-soft); background: var(--surface);
+    font-size: 12px; font-weight: 600; white-space: nowrap;
+    border-radius: 100px; padding: 3px 11px;
+    color: var(--fg-soft); background: var(--bg-alt);
   }
-  .badge.done { color: var(--done); border-color: var(--done); background: var(--accent-wash); }
-  .badge.now { color: var(--active); border-color: var(--active); background: var(--active-wash); }
-  @media (max-width: 620px) {
-    .item { grid-template-columns: 1fr auto; gap: 6px 14px; }
-    .item .when { grid-column: 1 / -1; }
+  .ev.done .badge { color: var(--teal); background: var(--teal-soft); }
+  .ev.now .badge { color: var(--amber); background: var(--amber-soft); }
+
+  /* ---------- feasibility ---------- */
+  .facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 24px; }
+  @media (max-width: 700px) { .facts { grid-template-columns: repeat(2, 1fr); } }
+  .fact {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: 18px; text-align: center; min-width: 0;
+  }
+  .fact .big { font-family: var(--serif); font-size: 26px; font-weight: 700; color: var(--teal); line-height: 1.1; }
+  .fact .small { font-size: 13.5px; color: var(--fg-soft); margin-top: 4px; }
+
+  /* ---------- citation ---------- */
+  pre.bib {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 12px; padding: 18px 20px; margin: 18px 0 0;
+    font-family: var(--mono); font-size: 13px; line-height: 1.6;
+    overflow-x: auto; color: var(--fg);
   }
 
-  /* meta grid */
-  .meta {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-    gap: 1px; background: var(--line);
-    border: 1px solid var(--line); border-radius: 5px; overflow: hidden;
-    margin-top: 10px;
-  }
-  .meta div { background: var(--surface); padding: 17px 19px; min-width: 0; }
-  .meta dt {
-    font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em;
-    text-transform: uppercase; color: var(--fg-soft); margin-bottom: 5px;
-  }
-  .meta dd { margin: 0; font-size: 15px; font-weight: 500; }
-
-  /* downloads */
-  .dl {
-    display: inline-flex; align-items: center; gap: 10px;
-    font-family: var(--sans); font-size: 15px; font-weight: 600;
-    color: #fff; background: var(--accent-deep);
-    border-radius: 4px; padding: 11px 18px; text-decoration: none;
-  }
-  .dl:hover { background: var(--accent); }
-  :root[data-theme="dark"] .dl { color: #0e1413; }
-  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .dl { color: #0e1413; } }
-  .dl .fmt { font-family: var(--mono); font-size: 11px; font-weight: 500; opacity: 0.85; }
-  .hero .dl { margin-top: 28px; }
-  .item .what a { color: var(--accent-deep); font-family: var(--mono); font-size: 12px; font-weight: 500; text-decoration: none; margin-left: 8px; }
-  .item .what a:hover { text-decoration: underline; }
-
-  footer .inner { padding-block: 34px; }
+  footer { border-top: 1px solid var(--line); padding-block: 32px; }
   .foot {
-    font-family: var(--mono); font-size: 12px; color: var(--fg-soft);
-    display: flex; flex-wrap: wrap; gap: 8px 20px;
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px;
+    font-size: 14px; color: var(--fg-soft);
   }
 </style>
 </head>
 <body>
 
-<div class="band">
-  <div class="inner hero">
-    <p class="eyebrow">TED University · CMPE 490 · Fall 2026</p>
-    <h1>DriftWatch</h1>
-    <p class="tagline">Knowing a deployed model has broken — before anyone labels the data.</p>
+<header class="hero">
+  <div class="wrap">
+    <span class="venue">CMPE 490 · TED University · Fall 2026</span>
+    <h1>Drift<span class="w">Watch</span></h1>
+    <p class="subtitle">Predicting the Performance Degradation of Deployed Models from Unlabeled Input Data</p>
+    <p class="authors"><strong>Doğa İdil Öcal</strong> <span class="sup">· supervised by</span> <strong>Ayşenur Birtürk</strong></p>
+    <p class="affil">Department of Computer Engineering, TED University, Ankara</p>
+    <div class="buttons">
+      <a class="btn primary" href="docs/DriftWatch_Research_Statement.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Research Statement <span class="fmt">PDF</span>
+      </a>
+      <a class="btn ghost" href="https://github.com/dogaidilocal/DriftWatch">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.25 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5Z"/></svg>
+        Repository
+      </a>
+    </div>
     <div class="chips">
-      <span class="chip">distribution shift</span>
-      <span class="chip">drift detection</span>
-      <span class="chip">label-free evaluation</span>
-      <span class="chip">CPU only</span>
+      <span class="chip c1">distribution shift</span>
+      <span class="chip c2">drift detection</span>
+      <span class="chip c3">label-free evaluation</span>
+      <span class="chip c4">CPU only</span>
     </div>
-    <a class="dl" href="docs/DriftWatch_Research_Statement.pdf" download>Download Research Statement <span class="fmt">PDF · 86 KB</span></a>
   </div>
-</div>
+</header>
 
-<div class="band alt">
-  <div class="inner">
-    <p class="eyebrow">The problem</p>
+<section style="padding-top:8px">
+  <div class="wrap">
+    <figure class="teaser">
+      <svg viewBox="0 0 660 300" role="img" aria-label="Schematic accuracy versus severity curves for three degradation factors, with an alarm threshold.">
+        <g class="grid">
+          <line x1="70" y1="40"  x2="620" y2="40"/>
+          <line x1="70" y1="75"  x2="620" y2="75"/>
+          <line x1="70" y1="110" x2="620" y2="110"/>
+          <line x1="70" y1="145" x2="620" y2="145"/>
+          <line x1="70" y1="180" x2="620" y2="180"/>
+          <line x1="70" y1="215" x2="620" y2="215"/>
+        </g>
+        <line class="axis" x1="70" y1="250" x2="620" y2="250"/>
+        <line class="axis" x1="70" y1="30" x2="70" y2="250"/>
+        <text x="60" y="44" text-anchor="end">100%</text>
+        <text x="60" y="114" text-anchor="end">80%</text>
+        <text x="60" y="184" text-anchor="end">60%</text>
+        <text x="60" y="254" text-anchor="end">40%</text>
+        <text x="70"  y="270" text-anchor="middle">0</text>
+        <text x="178" y="270" text-anchor="middle">1</text>
+        <text x="286" y="270" text-anchor="middle">2</text>
+        <text x="394" y="270" text-anchor="middle">3</text>
+        <text x="502" y="270" text-anchor="middle">4</text>
+        <text x="610" y="270" text-anchor="middle">5</text>
+        <text x="345" y="292" text-anchor="middle">degradation severity</text>
+        <text x="18" y="145" text-anchor="middle" transform="rotate(-90 18 145)">accuracy</text>
+
+        <line class="thr" x1="70" y1="110" x2="620" y2="110"/>
+        <text class="thr-l" x="80" y="103">alarm threshold</text>
+
+        <polyline class="ln s3" points="70,68 178,70 286,73 394,82 502,96 610,117"/>
+        <polyline class="ln s2" points="70,68 178,75 286,89 394,114 502,145 610,180"/>
+        <polyline class="ln s1" points="70,68 178,82 286,110 394,152 502,198 610,236"/>
+        <g class="dot">
+          <circle class="f3" cx="394" cy="82"  r="4.5"/><circle class="f3" cx="610" cy="117" r="4.5"/>
+          <circle class="f2" cx="394" cy="114" r="4.5"/><circle class="f2" cx="610" cy="180" r="4.5"/>
+          <circle class="f1" cx="286" cy="110" r="4.5"/><circle class="f1" cx="610" cy="236" r="4.5"/>
+        </g>
+        <text class="lbl f3" x="620" y="121">JPEG</text>
+        <text class="lbl f2" x="620" y="184">blur</text>
+        <text class="lbl f1" x="620" y="240">noise</text>
+      </svg>
+      <figcaption><b>Schematic of Stage 1.</b> Each degradation factor is applied alone at graded severity to a labeled test set, giving one accuracy–severity curve per factor. Factors differ in how much they cost, which is why DriftWatch weights drift signals by their measured impact. <i>Illustrative curves — not experimental results.</i></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section>
+  <div class="wrap abstract">
+    <p class="kicker center">Abstract</p>
+    <h2>Seeing a model fail before anyone labels the data</h2>
+    <p>Once a deep learning model is deployed, the appearance of the data reaching it changes over time: different capture devices, resolutions, compression settings and acquisition conditions. The model keeps producing normal-looking output and raises no errors, yet its accuracy quietly declines. Measuring that decline normally requires labels, which production data does not have.</p>
+    <p>DriftWatch connects two things that are usually studied apart. A <strong>controlled degradation benchmark</strong> measures, factor by factor, how much each kind of input change costs in accuracy. A <strong>label-free drift detector</strong> then measures the same factors in incoming data. Weighting drift signals by their measured cost aims to turn “the input changed” into “the model is likely losing accuracy.”</p>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <p class="kicker">The problem</p>
     <h2>Deployed models degrade silently</h2>
-    <p class="soft">Once a model is in production, the appearance of incoming data changes: different capture devices, resolutions, compression settings and acquisition conditions. The model raises no error and its output looks entirely normal, while accuracy quietly falls.</p>
-    <div class="steps">
-      <div class="step"><span class="n">01</span><span class="x">A model is trained, validated and deployed</span></div>
-      <div class="step"><span class="n">02</span><span class="x">The distribution of incoming data drifts</span></div>
-      <div class="step"><span class="n">03</span><span class="x">Accuracy falls, but nothing is raised</span></div>
-      <div class="step"><span class="n">04</span><span class="x">Measuring the loss requires <span class="term">labeled data</span></span></div>
-      <div class="step"><span class="n">05</span><span class="x">Production data is unlabeled — so the degradation stays invisible</span></div>
+    <p class="lead">The model raises no error and its output looks entirely normal, while accuracy quietly falls. Teams are left to wait for a user complaint or pay for regular annotation.</p>
+    <div class="chain">
+      <div class="link"><span class="n">01</span><div>A model is trained, validated and deployed</div></div>
+      <div class="link"><span class="n">02</span><div>The distribution of incoming data drifts</div></div>
+      <div class="link"><span class="n">03</span><div>Accuracy falls, but nothing is raised</div></div>
+      <div class="link"><span class="n">04</span><div>Measuring the loss requires <span class="term">labeled data</span></div></div>
+      <div class="link hot"><span class="n">05</span><div>Production data is unlabeled — so the loss stays invisible</div></div>
     </div>
   </div>
-</div>
+</section>
 
-<div class="band">
-  <div class="inner">
-    <p class="eyebrow">The approach</p>
-    <h2>Accuracy cannot be measured in production, but the input always can</h2>
-    <p class="soft">What is missing is not the data — it is knowing how much a given change in the input costs in accuracy. DriftWatch builds that mapping in the lab, then applies it in the field.</p>
+<section>
+  <div class="wrap">
+    <p class="kicker">The approach</p>
+    <h2>Accuracy can't be measured in production, but the input always can</h2>
+    <p class="lead">What is missing is not the data — it is knowing how much a given change in the input costs in accuracy. DriftWatch builds that mapping in the lab, then applies it in the field.</p>
     <div class="stages">
       <div class="stage">
-        <span class="lbl">Stage 1 — Lab</span>
+        <span class="lbl">Stage 1 · Lab</span>
         <h3>Controlled degradation benchmark</h3>
-        <p>Each degradation factor — noise, blur, JPEG compression, resolution loss, contrast shift, geometric distortion — is applied in isolation at graded severity levels to a labeled test set. Content is preserved, so the ground truth stays valid and no new annotation is needed.</p>
-        <p class="res">→ accuracy–severity curve per factor</p>
+        <p>Noise, blur, JPEG compression, resolution loss, contrast shift and geometric distortion are each applied in isolation, at graded severity, to a labeled test set. Content is preserved, so the ground truth stays valid and no new annotation is needed.</p>
+        <p class="res"><span>→</span> an accuracy–severity curve per factor</p>
       </div>
-      <div class="stage">
-        <span class="lbl">Stage 2 — Field</span>
+      <div class="arrow" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+      </div>
+      <div class="stage field">
+        <span class="lbl">Stage 2 · Field</span>
         <h3>Label-free drift detection</h3>
-        <p>The same image quality and statistical features are extracted from incoming data and compared against a reference distribution using Kolmogorov–Smirnov, Wasserstein distance and MMD — without labels, and without running the model.</p>
-        <p class="res">→ predicted accuracy loss + early warning</p>
+        <p>The same image quality and statistical features are extracted from incoming data and compared with a reference distribution using Kolmogorov–Smirnov, Wasserstein distance and MMD — without labels, and without running the model.</p>
+        <p class="res"><span>→</span> predicted accuracy loss and an early warning</p>
       </div>
     </div>
-    <p class="pull">Standard drift metrics measure how much an input <em>changed</em>. They do not measure how much that change <em>mattered</em>. DriftWatch weights each signal by the accuracy cost measured for it.</p>
+    <p class="insight">Standard drift metrics measure how much an input <em>changed</em>. They do not measure how much that change <em>mattered</em>. DriftWatch weights each signal by the accuracy cost measured for it.</p>
   </div>
-</div>
+</section>
 
-<div class="band alt">
-  <div class="inner">
-    <p class="eyebrow">Research questions</p>
-    <h2>What the study actually tests</h2>
+<section class="alt">
+  <div class="wrap">
+    <p class="kicker">Research questions</p>
+    <h2>What the study tests</h2>
     <div class="rqs">
-      <div class="rq"><span class="k">RQ1</span><span>Which degradation factors contribute most to accuracy loss, and how does this sensitivity differ across models?</span></div>
-      <div class="rq"><span class="k">RQ2</span><span>To what extent do standard drift metrics correlate with actual accuracy loss?</span></div>
-      <div class="rq"><span class="k">RQ3</span><span>Does an impact-weighted drift score predict degradation better than an unweighted one?</span></div>
+      <div class="rq"><span class="k">RQ1</span><p>Which degradation factors contribute most to accuracy loss, and how does this sensitivity differ across models?</p></div>
+      <div class="rq"><span class="k">RQ2</span><p>To what extent do standard drift metrics correlate with actual accuracy loss?</p></div>
+      <div class="rq"><span class="k">RQ3</span><p>Does an impact-weighted drift score predict degradation better than an unweighted one?</p></div>
     </div>
-    <p style="margin-top:24px" class="soft">Evaluation uses Spearman correlation between drift score and accuracy loss, AUROC for early-warning performance, and detection delay — how many severity levels before accuracy crosses a threshold the alarm fires.</p>
+    <div class="metrics">
+      <div class="metric"><b>Spearman ρ</b><span>between drift score and accuracy loss</span></div>
+      <div class="metric"><b>AUROC</b><span>for early-warning performance</span></div>
+      <div class="metric"><b>Detection delay</b><span>severity levels before the threshold is crossed</span></div>
+    </div>
   </div>
-</div>
+</section>
 
-<div class="band">
-  <div class="inner">
-    <p class="eyebrow">Progress</p>
+<section>
+  <div class="wrap">
+    <p class="kicker">Expected contribution</p>
+    <h2>Three outputs, each useful on its own</h2>
+    <div class="contrib">
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-6"/></svg></div>
+        <h3>Factor-resolved benchmark</h3>
+        <p>A reusable degradation benchmark for comparing the robustness of new models, factor by factor.</p>
+      </div>
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></div>
+        <h3>Performance-aligned evaluation</h3>
+        <p>An evaluation of drift detectors by whether the shift they flag actually harms the task — a step current work omits.</p>
+      </div>
+      <div class="card">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M5 7h14"/><path d="m5 7-3 7a4 4 0 0 0 6 0Z"/><path d="m19 7-3 7a4 4 0 0 0 6 0Z"/></svg></div>
+        <h3>Impact-weighted drift score</h3>
+        <p>A drift score that combines the two, weighting each signal by the accuracy cost measured for it.</p>
+      </div>
+    </div>
+    <p class="note">A negative result for the weighting is itself reportable, since the alignment measurement stands independently.</p>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <p class="kicker">Progress</p>
     <h2>Deliverables</h2>
-    <div class="track">
-      <div class="item">
+    <div class="timeline">
+      <div class="ev done"><div class="ev-row">
         <span class="when">16 Oct 2026</span>
         <span class="what">1-Page Research Statement<a href="docs/DriftWatch_Research_Statement.pdf" download>PDF ↓</a><small>Problem, gap, approach, research question</small></span>
-        <span class="badge done">Submitted</span>
-      </div>
-      <div class="item">
+        <span class="badge">Submitted</span>
+      </div></div>
+      <div class="ev now"><div class="ev-row">
         <span class="when">Weeks 4–6</span>
         <span class="what">Literature Review<small>Corruption benchmarks, drift detection, label-free performance estimation</small></span>
-        <span class="badge now">In progress</span>
-      </div>
-      <div class="item">
+        <span class="badge">In progress</span>
+      </div></div>
+      <div class="ev"><div class="ev-row">
         <span class="when">13 Nov 2026</span>
         <span class="what">Progress Report 1<small>Title + abstract, introduction, proposed method, references</small></span>
-        <span class="badge">Coming soon</span>
-      </div>
-      <div class="item">
+        <span class="badge">Upcoming</span>
+      </div></div>
+      <div class="ev"><div class="ev-row">
         <span class="when">11 Dec 2026</span>
         <span class="what">Progress Report 2<small>Revised sections, experiment design, experiment plan</small></span>
-        <span class="badge">Coming soon</span>
-      </div>
-      <div class="item">
+        <span class="badge">Upcoming</span>
+      </div></div>
+      <div class="ev"><div class="ev-row">
         <span class="when">Weeks 12–13</span>
         <span class="what">Experimental Results<small>Robustness profiles, alignment analysis, figures</small></span>
-        <span class="badge">Coming soon</span>
-      </div>
-      <div class="item">
+        <span class="badge">Upcoming</span>
+      </div></div>
+      <div class="ev"><div class="ev-row">
         <span class="when">31 Dec 2026</span>
         <span class="what">Academic Paper<small>Full write-up of method, experiments and findings</small></span>
-        <span class="badge">Coming soon</span>
-      </div>
-      <div class="item">
+        <span class="badge">Upcoming</span>
+      </div></div>
+      <div class="ev"><div class="ev-row">
         <span class="when">Jan 2027</span>
         <span class="what">Online Presentation<small>Final defence during the examination period</small></span>
-        <span class="badge">Coming soon</span>
-      </div>
+        <span class="badge">Upcoming</span>
+      </div></div>
     </div>
   </div>
-</div>
+</section>
 
-<div class="band alt">
-  <div class="inner">
-    <p class="eyebrow">Feasibility</p>
+<section>
+  <div class="wrap">
+    <p class="kicker">Feasibility</p>
     <h2>The hardware constraint is a design choice</h2>
-    <dl class="meta">
-      <div><dt>Hardware</dt><dd>CPU — no GPU</dd></div>
-      <div><dt>Training</dt><dd>None — inference only</dd></div>
-      <div><dt>Annotation</dt><dd>No added cost</dd></div>
-      <div><dt>Budget</dt><dd>Zero</dd></div>
-    </dl>
-    <p style="margin-top:22px" class="soft">The method is <span class="term">model-agnostic</span>: the pipeline is unchanged across segmentation, classification and detection. The work is staged — the benchmark stands on its own as a completed contribution even if the second stage runs into trouble.</p>
-  </div>
-</div>
-
-<footer class="band">
-  <div class="inner">
-    <dl class="meta" style="margin-bottom:22px">
-      <div><dt>Student</dt><dd>Doğa İdil Öcal</dd></div>
-      <div><dt>Supervisor</dt><dd>Ayşenur Birtürk</dd></div>
-      <div><dt>Course</dt><dd>CMPE 490</dd></div>
-      <div><dt>Term</dt><dd>Fall 2026</dd></div>
-    </dl>
-    <div class="foot">
-      <span>TED University</span>
-      <span>Department of Computer Engineering</span>
-      <span>Introduction to Research in Computer Engineering</span>
+    <div class="facts">
+      <div class="fact"><div class="big">CPU</div><div class="small">no GPU needed</div></div>
+      <div class="fact"><div class="big">0</div><div class="small">models trained — inference only</div></div>
+      <div class="fact"><div class="big">0</div><div class="small">new annotations</div></div>
+      <div class="fact"><div class="big">₺0</div><div class="small">budget</div></div>
     </div>
+    <p class="lead" style="margin-top:24px">The method is <span class="term">model-agnostic</span>: the pipeline is unchanged across segmentation, classification and detection. The work is staged, so the benchmark stands on its own as a completed contribution even if the second stage runs into trouble.</p>
+  </div>
+</section>
+
+<section class="alt">
+  <div class="wrap">
+    <p class="kicker">Citation</p>
+    <h2>Cite this work</h2>
+<pre class="bib">@misc{ocal2026driftwatch,
+  title  = {DriftWatch: Predicting the Performance Degradation of
+            Deployed Models from Unlabeled Input Data},
+  author = {{\"O}cal, Do{\u{g}}a {\.I}dil},
+  note   = {CMPE 490 Research Statement, supervised by Ay{\c{s}}enur Birt{\"u}rk},
+  school = {TED University, Department of Computer Engineering},
+  year   = {2026}
+}</pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span>© 2026 Doğa İdil Öcal · TED University</span>
+    <span>CMPE 490 — Introduction to Research in Computer Engineering</span>
   </div>
 </footer>
 
