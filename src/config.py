@@ -1,4 +1,5 @@
 """Project-wide paths and constants."""
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -12,7 +13,12 @@ for d in (DATA_DIR, RESULTS_DIR, FIGURES_DIR):
 
 # CIFAR-10-C layout: each .npy is (50000, 32, 32, 3) uint8.
 # Rows are stacked by severity: 1..5, 10000 test images each.
-IMAGES_PER_SEVERITY = 10_000
+#
+# DW_IMAGES_PER_SEVERITY overrides this for a reduced run on a subsample of each
+# severity block (the first K images, the same K across every corruption so the
+# comparison stays like-for-like). Used when the full 2.9 GB set cannot be moved
+# to the machine doing inference. Any result produced with an override must say so.
+IMAGES_PER_SEVERITY = int(os.environ.get("DW_IMAGES_PER_SEVERITY", 10_000))
 SEVERITIES = (1, 2, 3, 4, 5)
 
 # The 15 corruptions of the main benchmark, grouped as in Hendrycks & Dietterich (2019).

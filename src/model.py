@@ -2,25 +2,50 @@
 
 The model is never trained or modified anywhere in this project.
 """
+from pathlib import Path
+
 import numpy as np
 import torch
 import torch.nn as nn
 
-from config import BATCH_SIZE, MODEL_NAME, NORM_MEAN, NORM_STD
+from config import BATCH_SIZE, NORM_MEAN, NORM_STD
+from resnet20 import resnet20
+
+WEIGHTS_PATH = Path(__file__).resolve().parent.parent / "weights" / "cifar10_resnet20.pt"
+WEIGHTS_URL = (
+    "https://github.com/chenyaofo/pytorch-cifar-models/releases/download/"
+    "resnet/cifar10_resnet20-4118986f.pt"
+)
 
 
 def load_model(pretrained=True):
-    """Load a pretrained CIFAR-10 classifier in eval mode on CPU.
+    """Load the pretrained CIFAR-10 classifier in eval mode on CPU.
+
+    Weights are read from weights/cifar10_resnet20.pt, the published checkpoint
+    from chenyaofo/pytorch-cifar-models (see WEIGHTS_URL). They are loaded into
+    the locally defined architecture with strict=True, so a mismatch fails loudly
+    rather than silently producing a partly random network.
 
     pretrained=False returns random weights and is for pipeline testing only;
     accuracy figures from it are meaningless.
     """
-    if pretrained:
-        model = torch.hub.load(
-            "chenyaofo/pytorch-cifar-models", MODEL_NAME, pretrained=True, trust_repo=True
-        )
-    else:
+    if not pretrained:
         model = _TinyNet()
+        model.eval()
+        return model
+
+    if not WEIGHTS_PATH.exists():
+        raise FileNotFoundError(
+            f"missing checkpoint: {WEIGHTS_PATH}\nDownload it with:\n"
+            f"  curl -L -o {WEIGHTS_PATH} {WEIGHTS_URL}"
+        )
+
+    state = torch.load(WEIGHTS_PATH, map_location="cpu")
+    if isinstance(state, dict) and "state_dict" in state:
+        state = state["state_dict"]
+
+    model = resnet20(num_classes=10)
+    model.load_state_dict(state, strict=True)
     model.eval()
     return model
 

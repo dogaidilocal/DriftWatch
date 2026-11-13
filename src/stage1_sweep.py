@@ -37,6 +37,10 @@ def parse_args():
                     help="random weights; for testing the pipeline only")
     ap.add_argument("--skip-clean", action="store_true",
                     help="skip the clean-accuracy reference measurement")
+    ap.add_argument("--clean-ref", type=float, default=None,
+                    help="clean accuracy measured elsewhere, used as the drop reference "
+                         "when clean CIFAR-10 is not available locally; recorded as "
+                         "corruption='clean_published' so its provenance stays visible")
     return ap.parse_args()
 
 
@@ -67,6 +71,12 @@ def main():
         print(f"  clean accuracy = {clean_acc:.4f}   ({len(imgs)} images, {time.time() - t0:.1f}s)")
         rows.append({"corruption": "clean", "severity": 0,
                      "accuracy": clean_acc, "n_images": len(imgs)})
+    elif args.clean_ref is not None:
+        clean_acc = args.clean_ref
+        print(f"Clean reference taken from the model source: {clean_acc:.4f} "
+              "(not measured here)")
+        rows.append({"corruption": "clean_published", "severity": 0,
+                     "accuracy": clean_acc, "n_images": 0})
 
     # --- corruption sweep -----------------------------------------------
     present = available_corruptions()
