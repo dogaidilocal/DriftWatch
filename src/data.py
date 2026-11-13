@@ -1,7 +1,7 @@
 """Loading clean CIFAR-10 and corrupted CIFAR-10-C batches."""
 import numpy as np
 
-from config import CIFAR10C_DIR, DATA_DIR, IMAGES_PER_SEVERITY
+from config import CIFAR10_PY_DIR, CIFAR10C_DIR, DATA_DIR, IMAGES_PER_SEVERITY
 
 
 def load_labels():
@@ -43,13 +43,27 @@ def load_corruption(name, severity):
 def load_clean():
     """Clean CIFAR-10 test set as (images, labels), uint8 (10000, 32, 32, 3).
 
-    Downloads via torchvision on first call.
+    Read from the extracted python-version archive rather than downloaded, since
+    cs.toronto.edu is not reachable from the environments this project runs in.
+    Obtain it once with:
+        curl -LO https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
+        tar -xzf cifar-10-python.tar.gz -C data/
     """
-    from torchvision.datasets import CIFAR10
+    import pickle
 
-    ds = CIFAR10(root=str(DATA_DIR), train=False, download=True)
-    images = ds.data.astype(np.uint8)
-    labels = np.array(ds.targets, dtype=np.int64)
+    path = CIFAR10_PY_DIR / "test_batch"
+    if not path.exists():
+        raise FileNotFoundError(
+            f"{path} not found. Extract cifar-10-python.tar.gz into {DATA_DIR}."
+        )
+
+    with open(path, "rb") as f:
+        batch = pickle.load(f, encoding="bytes")
+
+    # Rows are flat 3072-vectors in channel-major order; restore (N, H, W, C)
+    # to match the layout CIFAR-10-C uses.
+    images = batch[b"data"].reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1).astype(np.uint8)
+    labels = np.array(batch[b"labels"], dtype=np.int64)
     return images, labels
 
 

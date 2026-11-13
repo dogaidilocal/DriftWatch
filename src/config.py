@@ -5,6 +5,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DATA_DIR = ROOT / "data"
 CIFAR10C_DIR = DATA_DIR / "CIFAR-10-C"
+# Clean CIFAR-10, python version, as extracted from cifar-10-python.tar.gz.
+# Read from disk rather than downloaded: cs.toronto.edu is not reachable from
+# the environments this project runs in.
+CIFAR10_PY_DIR = DATA_DIR / "cifar-10-batches-py"
 RESULTS_DIR = ROOT / "results"
 FIGURES_DIR = ROOT / "figures"
 
