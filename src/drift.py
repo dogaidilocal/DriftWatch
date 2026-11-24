@@ -66,11 +66,29 @@ def dominant_feature(drift_dict, weights):
     return max(contributions, key=contributions.get)
 
 
+def reference_gamma(reference, n=500, seed=0):
+    """RBF kernel width from the reference alone (median heuristic).
+
+    Pass the result as mmd_rbf(..., gamma=...) whenever MMD values are compared
+    across batches. Left at None, mmd_rbf picks gamma from the pooled reference
+    and batch, so a strongly shifted batch widens its own kernel and compresses
+    its own MMD — the values then sit on different scales and cannot be ranked.
+    """
+    rng = np.random.default_rng(seed)
+    X = _standardise(reference, reference)
+    X = X[rng.choice(len(X), min(n, len(X)), replace=False)]
+    d2 = _sq_dists(X, X)
+    med = np.median(d2[d2 > 0]) if (d2 > 0).any() else 1.0
+    return 1.0 / med if med > 0 else 1.0
+
+
 def mmd_rbf(reference, batch, gamma=None, max_n=2000, seed=0):
     """Maximum Mean Discrepancy with an RBF kernel, across all features jointly.
 
     Subsampled to max_n per side: MMD is O(n^2) and the full 10,000x10,000
     kernel is both slow and unnecessary for a stable estimate.
+
+    For comparisons across batches, fix gamma with reference_gamma(); see there.
     """
     rng = np.random.default_rng(seed)
     X = _standardise(reference, reference)

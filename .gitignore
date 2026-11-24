@@ -9,6 +9,9 @@ __pycache__/
 data/
 weights/
 
+# Stage 2 feature cache — recomputable from data/ with src/stage2_features.py.
+cache/
+
 # Transfer scratch — chunk files used to move a subsample of CIFAR-10-C onto a
 # machine that could not download it directly. tools/unpack_subsample.py reads
 # these; once unpacked into data/ they can be deleted.

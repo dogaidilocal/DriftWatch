@@ -37,9 +37,23 @@ measurements, in `results/stage1_accuracy.csv`.
 - Glass blur costs 45.9 points at severity 1 while defocus blur costs 0.9 — same
   family, same label. Weights must be learned from features, not assigned per family.
 
-**Stage 2 is not done.** `features.py` and `drift.py` are written and behave
-correctly on synthetic inputs, but have never been run on real corrupted data.
-That is the current task.
+**Stage 2, weeks 8–9 done (24 Nov, K=2000 override).** `src/stage2_features.py`
+caches the six features to `cache/stage2_features.npz` (gitignored) and draws
+`figures/stage2_feature_histograms.png`; `src/stage2_drift.py` writes
+`results/stage2_drift.csv`, one row per batch (95 corrupted + 1 clean null batch).
+
+- Reference = clean test images [K, 10000); every batch is images [0, K), so the two
+  sides are disjoint. The clean [0, K) row is the noise floor (unweighted KS 0.017;
+  KS 5% critical value 0.034). Only pixelate s1 stays below it on every feature.
+- MMD uses one kernel width fixed from the reference (`drift.reference_gamma`). The
+  default per-call median heuristic rescales the kernel per batch and makes MMD
+  values incomparable across batches.
+- **Preliminary RQ2:** Spearman with accuracy drop over 95 batches is only ~0.5
+  (unweighted KS 0.49, unweighted Wasserstein 0.54, MMD 0.54). Within one corruption
+  drift ranks severity almost perfectly (ρ ≈ 1 for 15 of 19); the failure is
+  *across* corruptions. Contrast and fog move features a lot and cost little;
+  pixelate, JPEG and glass blur cost 20–52 points while barely moving any feature.
+  Week 10 risk: weighting rescales features but cannot help where no feature moves.
 
 ## Current task — weeks 8 and 9 of the plan
 
@@ -121,6 +135,9 @@ src/features.py        the six image features
 src/drift.py           per_feature_drift, unweighted/weighted score, dominant_feature, mmd_rbf
 src/stage1_sweep.py    the benchmark sweep
 src/stage1_figures.py  accuracy-severity curves and ranked-drop figure
+src/stage2_features.py six features for clean + all batches, cached; sanity histograms
+src/stage2_drift.py    per-batch KS / Wasserstein / MMD joined with accuracy drop
+results/stage2_drift.csv
 tests/test_slicing.py  verifies severity slicing against known per-block offsets
 tools/unpack_subsample.py
 data/CIFAR-10-C/       19 corruptions, 2,000 images per severity block
