@@ -62,6 +62,33 @@ step does and why before running it; do not run ahead and complete the task for 
 She is a capable programmer but new to this domain, so define domain terms the first
 time they appear and keep English technical terms even when writing Turkish.
 
+## First-time setup on the user's machine
+
+The working copy at `C:\Users\Ismail Ocal\Documents\driftwatch` is a plain folder,
+not a git clone, so files arrive there by being written rather than pulled. It
+therefore holds the code and the data but not `index.html`, which lives in the
+GitHub repository and serves the project site. Nothing depends on that file locally.
+
+Three things are missing until setup is done, and all three are expected:
+
+```powershell
+# 1. virtual environment
+python -m venv .venv
+.venv\Scripts\Activate.ps1          # if blocked: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+pip install -r requirements.txt
+
+# 2. corrupted data, rebuilt from the transfer chunks already in _transfer\
+$env:DW_IMAGES_PER_SEVERITY = "2000"
+python tools\unpack_subsample.py _transfer
+
+# 3. clean data — the archive is ALREADY in the user's Downloads folder.
+#    Do not tell her to download it again.
+tar -xzf "$env:USERPROFILE\Downloads\cifar-10-python.tar.gz" -C data
+```
+
+After this, `data\CIFAR-10-C\` holds 19 corruptions and `data\cifar-10-batches-py\`
+holds the clean test set.
+
 ## Running the code
 
 Everything is CPU-only. No training ever happens — the model is used for inference

@@ -1,10 +1,14 @@
-torch
-torchvision
+# Stage 2 — feature extraction and drift tests.
+# This is everything needed for the current work; it installs in about a minute.
 numpy
 scipy
 scikit-learn
-scikit-image
 opencv-python
 matplotlib
 pandas
 tqdm
+
+# Stage 1 only — model inference, already complete and recorded in
+# results/stage1_accuracy.csv. torch pulls roughly 3 GB of CUDA dependencies on
+# Linux, so install it only when the degradation sweep actually has to be re-run:
+#   pip install torch
