@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="DriftWatch — predicting the performance degradation of deployed models from unlabeled input data. CMPE 490, TED University, Fall 2026.">
+<meta name="description" content="DriftWatch — predicting the performance degradation of deployed models from unlabeled input data. Measured across 19 corruption types on CIFAR-10-C. CMPE 490, TED University, Fall 2026.">
 <title>DriftWatch</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -157,12 +157,13 @@
   .teaser text { font-family: var(--sans); font-size: 12px; fill: var(--fg-soft); }
   .teaser .grid { stroke: var(--line); stroke-width: 1; }
   .teaser .axis { stroke: var(--fg-soft); stroke-width: 1.2; }
-  .teaser .thr { stroke: var(--coral); stroke-width: 1.4; stroke-dasharray: 5 5; }
-  .teaser .thr-l { fill: var(--coral); font-weight: 600; }
+  .teaser .thr { stroke: var(--fg-soft); stroke-width: 1.3; stroke-dasharray: 5 5; opacity: .8; }
+  .teaser .thr-l { fill: var(--fg-soft); font-weight: 600; }
   .teaser .ln { fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
-  .teaser .s1 { stroke: var(--primary); } .teaser .f1 { fill: var(--primary); }
-  .teaser .s2 { stroke: var(--teal); }    .teaser .f2 { fill: var(--teal); }
-  .teaser .s3 { stroke: var(--amber); }   .teaser .f3 { fill: var(--amber); }
+  .teaser .sg { stroke: var(--fg-soft); stroke-width: 1.4; opacity: .32; }
+  .teaser .s1 { stroke: var(--coral); } .teaser .f1 { fill: var(--coral); }
+  .teaser .s2 { stroke: var(--teal); }  .teaser .f2 { fill: var(--teal); }
+  .teaser .s3 { stroke: var(--primary); } .teaser .f3 { fill: var(--primary); }
   .teaser .lbl { font-weight: 600; font-size: 12.5px; }
   .teaser .dot { stroke: var(--surface); stroke-width: 2; }
   figcaption {
@@ -172,6 +173,44 @@
   }
   figcaption b { color: var(--fg); font-weight: 600; }
   figure { margin: 0; }
+
+  /* ---------- results ---------- */
+  .headline {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 26px;
+  }
+  @media (max-width: 700px) { .headline { grid-template-columns: 1fr; } }
+  .stat {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 20px 22px; min-width: 0;
+  }
+  .stat .v {
+    font-family: var(--serif); font-size: 36px; font-weight: 700; line-height: 1.05;
+    letter-spacing: -.02em;
+  }
+  .stat:nth-child(1) .v { color: var(--coral); }
+  .stat:nth-child(2) .v { color: var(--primary); }
+  .stat:nth-child(3) .v { color: var(--teal); }
+  .stat .t { font-weight: 600; font-size: 15px; margin-top: 6px; }
+  .stat .d { font-size: 14px; color: var(--fg-soft); margin-top: 2px; }
+
+  .bars { background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+          box-shadow: var(--shadow); padding: 20px 22px 14px; margin-top: 18px; }
+  .bars svg { display: block; width: 100%; height: auto; }
+  .bars .bl { font-family: var(--sans); font-size: 11.5px; fill: var(--fg-soft); }
+  .bars .bv { font-family: var(--mono); font-size: 10.5px; fill: var(--fg-soft); }
+  .bars .bg { fill: var(--line); }
+  .bars .b1 { fill: var(--coral); }
+  .bars .b3 { fill: var(--primary); }
+  .bars .tick { stroke: var(--line); stroke-width: 1; }
+  .bars .tl { font-family: var(--sans); font-size: 10.5px; fill: var(--fg-soft); }
+
+  .findings { display: grid; gap: 12px; margin-top: 24px; }
+  .finding {
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 3px solid var(--violet);
+    border-radius: 10px; padding: 15px 18px; font-size: 15px;
+  }
+  .finding b { font-weight: 600; }
 
   /* ---------- headings & text ---------- */
   .kicker {
@@ -332,6 +371,12 @@
   .ev .when { font-family: var(--mono); font-size: 12.5px; color: var(--fg-soft); min-width: 104px; }
   .ev .what { flex: 1 1 260px; min-width: 0; font-weight: 600; }
   .ev .what small { display: block; font-weight: 400; font-size: 14px; color: var(--fg-soft); }
+  .ev .what .wt {
+    font-family: var(--mono); font-size: 11px; font-weight: 500;
+    color: var(--fg-soft); background: var(--bg-alt);
+    border: 1px solid var(--line); border-radius: 100px; padding: 1px 7px;
+    vertical-align: 1px;
+  }
   .ev .what a { font-family: var(--mono); font-size: 12px; font-weight: 500; margin-left: 8px; text-decoration: none; }
   .ev .what a:hover { text-decoration: underline; }
   .badge {
@@ -377,7 +422,11 @@
     <p class="authors"><strong>Doğa İdil Öcal</strong> <span class="sup">· supervised by</span> <strong>Ayşenur Birtürk</strong></p>
     <p class="affil">Department of Computer Engineering, TED University, Ankara</p>
     <div class="buttons">
-      <a class="btn primary" href="docs/DriftWatch_Research_Statement.pdf" download>
+      <a class="btn primary" href="docs/DriftWatch_Progress_Report_1.pdf" download>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+        Progress Report 1 <span class="fmt">PDF</span>
+      </a>
+      <a class="btn ghost" href="docs/DriftWatch_Research_Statement.pdf" download>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
         Research Statement <span class="fmt">PDF</span>
       </a>
@@ -398,46 +447,58 @@
 <section style="padding-top:8px">
   <div class="wrap">
     <figure class="teaser">
-      <svg viewBox="0 0 660 300" role="img" aria-label="Schematic accuracy versus severity curves for three degradation factors, with an alarm threshold.">
+      <svg viewBox="0 0 744 300" role="img" aria-label="Measured accuracy against corruption severity for 19 corruption types on CIFAR-10-C. Gaussian noise falls to 22 percent while brightness stays near 87 percent.">
         <g class="grid">
           <line x1="70" y1="40"  x2="620" y2="40"/>
-          <line x1="70" y1="75"  x2="620" y2="75"/>
-          <line x1="70" y1="110" x2="620" y2="110"/>
-          <line x1="70" y1="145" x2="620" y2="145"/>
-          <line x1="70" y1="180" x2="620" y2="180"/>
-          <line x1="70" y1="215" x2="620" y2="215"/>
+          <line x1="70" y1="82"  x2="620" y2="82"/>
+          <line x1="70" y1="124" x2="620" y2="124"/>
+          <line x1="70" y1="166" x2="620" y2="166"/>
+          <line x1="70" y1="208" x2="620" y2="208"/>
         </g>
         <line class="axis" x1="70" y1="250" x2="620" y2="250"/>
         <line class="axis" x1="70" y1="30" x2="70" y2="250"/>
-        <text x="60" y="44" text-anchor="end">100%</text>
-        <text x="60" y="114" text-anchor="end">80%</text>
-        <text x="60" y="184" text-anchor="end">60%</text>
-        <text x="60" y="254" text-anchor="end">40%</text>
+        <text x="60" y="44"  text-anchor="end">100%</text>
+        <text x="60" y="86"  text-anchor="end">80%</text>
+        <text x="60" y="128" text-anchor="end">60%</text>
+        <text x="60" y="170" text-anchor="end">40%</text>
+        <text x="60" y="212" text-anchor="end">20%</text>
         <text x="70"  y="270" text-anchor="middle">0</text>
         <text x="178" y="270" text-anchor="middle">1</text>
         <text x="286" y="270" text-anchor="middle">2</text>
         <text x="394" y="270" text-anchor="middle">3</text>
         <text x="502" y="270" text-anchor="middle">4</text>
         <text x="610" y="270" text-anchor="middle">5</text>
-        <text x="345" y="292" text-anchor="middle">degradation severity</text>
-        <text x="18" y="145" text-anchor="middle" transform="rotate(-90 18 145)">accuracy</text>
+        <text x="345" y="292" text-anchor="middle">corruption severity</text>
+        <text x="18" y="145" text-anchor="middle" transform="rotate(-90 18 145)">top-1 accuracy</text>
 
-        <line class="thr" x1="70" y1="110" x2="620" y2="110"/>
-        <text class="thr-l" x="80" y="103">alarm threshold</text>
+        <line class="thr" x1="70" y1="56" x2="620" y2="56"/>
+        <text class="thr-l" x="80" y="50">clean reference · 92.4%</text>
 
-        <polyline class="ln s3" points="70,68 178,70 286,73 394,82 502,96 610,117"/>
-        <polyline class="ln s2" points="70,68 178,75 286,89 394,114 502,145 610,180"/>
-        <polyline class="ln s1" points="70,68 178,82 286,110 394,152 502,198 610,236"/>
-        <g class="dot">
-          <circle class="f3" cx="394" cy="82"  r="4.5"/><circle class="f3" cx="610" cy="117" r="4.5"/>
-          <circle class="f2" cx="394" cy="114" r="4.5"/><circle class="f2" cx="610" cy="180" r="4.5"/>
-          <circle class="f1" cx="286" cy="110" r="4.5"/><circle class="f1" cx="610" cy="236" r="4.5"/>
-        </g>
-        <text class="lbl f3" x="620" y="121">JPEG</text>
-        <text class="lbl f2" x="620" y="184">blur</text>
-        <text class="lbl f1" x="620" y="240">noise</text>
+        <polyline class="ln sg" points="70,56.0 178,57.7 286,67.4 394,83.2 502,112.3 610,197.8"/>
+        <polyline class="ln sg" points="70,56.0 178,57.8 286,61.1 394,73.2 502,95.2 610,145.2"/>
+        <polyline class="ln sg" points="70,56.0 178,70.2 286,69.1 394,80.8 502,96.0 610,105.9"/>
+        <polyline class="ln sg" points="70,56.0 178,58.4 286,60.6 394,65.7 502,76.2 610,117.2"/>
+        <polyline class="ln sg" points="70,56.0 178,68.1 286,83.3 394,105.3 502,111.0 610,131.5"/>
+        <polyline class="ln sg" points="70,56.0 178,57.6 286,73.6 394,101.5 502,134.2 610,184.1"/>
+        <polyline class="ln sg" points="70,56.0 178,152.3 286,148.0 394,138.8 502,169.4 610,160.8"/>
+        <polyline class="ln sg" points="70,56.0 178,83.5 286,109.2 394,129.5 502,170.0 610,197.0"/>
+        <polyline class="ln sg" points="70,56.0 178,75.1 286,86.6 394,90.5 502,97.5 610,103.6"/>
+        <polyline class="ln sg" points="70,56.0 178,69.2 286,87.8 394,108.0 502,109.6 610,125.6"/>
+        <polyline class="ln sg" points="70,56.0 178,64.6 286,80.8 394,93.4 502,134.6 610,166.1"/>
+        <polyline class="ln sg" points="70,56.0 178,62.4 286,67.5 394,57.3 502,63.3 610,75.0"/>
+        <polyline class="ln sg" points="70,56.0 178,79.5 286,103.8 394,156.8 502,173.1 610,192.6"/>
+        <polyline class="ln sg" points="70,56.0 178,72.9 286,101.0 394,88.6 502,93.3 610,103.2"/>
+        <polyline class="ln sg" points="70,56.0 178,64.6 286,79.5 394,87.4 502,79.8 610,100.5"/>
+        <polyline class="ln sg" points="70,56.0 178,78.6 286,112.0 394,131.8 502,162.4 610,181.4"/>
+        <polyline class="ln sg" points="70,56.0 178,75.6 286,83.3 394,98.6 502,110.0 610,132.6"/>
+        <polyline class="ln s3" points="70,56.0 178,56.7 286,57.1 394,59.4 502,61.2 610,68.1"/>
+        <polyline class="ln s1" points="70,56.0 178,98.5 286,148.9 394,185.7 502,196.3 610,203.8"/>
+        <circle class="dot f3" cx="610" cy="68.1" r="4.5"/>
+        <circle class="dot f1" cx="610" cy="203.8" r="4.5"/>
+        <text class="lbl f3" x="624" y="72">brightness</text>
+        <text class="lbl f1" x="624" y="208">gaussian noise</text>
       </svg>
-      <figcaption><b>Schematic of Stage 1.</b> Each degradation factor is applied alone at graded severity to a labeled test set, giving one accuracy–severity curve per factor. Factors differ in how much they cost, which is why DriftWatch weights drift signals by their measured impact. <i>Illustrative curves — not experimental results.</i></figcaption>
+      <figcaption><b>Stage 1, measured.</b> Accuracy of a pretrained ResNet-20 on all 19 CIFAR-10-C corruption types at five severities — 95 measurements. At severity 5 the two highlighted curves are 64.6 points apart, although both carry the same severity label. That gap is the premise the method rests on.</figcaption>
     </figure>
   </div>
 </section>
@@ -475,7 +536,7 @@
       <div class="stage">
         <span class="lbl">Stage 1 · Lab</span>
         <h3>Controlled degradation benchmark</h3>
-        <p>Noise, blur, JPEG compression, resolution loss, contrast shift and geometric distortion are each applied in isolation, at graded severity, to a labeled test set. Content is preserved, so the ground truth stays valid and no new annotation is needed.</p>
+        <p>Noise, blur, weather and digital corruptions are each applied in isolation, at five graded severities, to a labeled test set — 19 types in all, following the CIFAR-10-C protocol. Content is preserved, so the ground truth stays valid and no new annotation is needed.</p>
         <p class="res"><span>→</span> an accuracy–severity curve per factor</p>
       </div>
       <div class="arrow" aria-hidden="true">
@@ -494,6 +555,75 @@
 
 <section class="alt">
   <div class="wrap">
+    <p class="kicker">Results · Stage 1 complete</p>
+    <h2>The same severity label costs wildly different amounts of accuracy</h2>
+    <p class="lead">A pretrained ResNet-20 was run over all 19 CIFAR-10-C corruption types at five severity levels — 95 measurements — against a clean reference of 92.4% measured on the same images.</p>
+
+    <div class="headline">
+      <div class="stat">
+        <div class="v">12.1×</div>
+        <div class="t">spread at one severity label</div>
+        <div class="d">Most damaging corruption versus least, both at severity 5</div>
+      </div>
+      <div class="stat">
+        <div class="v">70.4 <span style="font-size:19px">pp</span></div>
+        <div class="t">gaussian noise, severity 5</div>
+        <div class="d">Accuracy falls to 22.0%</div>
+      </div>
+      <div class="stat">
+        <div class="v">5.8 <span style="font-size:19px">pp</span></div>
+        <div class="t">brightness, severity 5</div>
+        <div class="d">Accuracy stays at 86.6%</div>
+      </div>
+    </div>
+
+    <figure class="bars">
+      <svg viewBox="0 0 640 352" role="img" aria-label="Accuracy drop at severity 5 for each of the 19 corruption types, ranked from gaussian noise at 70.4 points down to brightness at 5.8 points.">
+        <g class="tick">
+          <line x1="150" y1="24" x2="150" y2="330"/>
+          <line x1="269" y1="24" x2="269" y2="330"/>
+          <line x1="389" y1="24" x2="389" y2="330"/>
+          <line x1="508" y1="24" x2="508" y2="330"/>
+        </g>
+        <text class="tl" x="150" y="18" text-anchor="middle">0</text>
+        <text class="tl" x="269" y="18" text-anchor="middle">20</text>
+        <text class="tl" x="389" y="18" text-anchor="middle">40</text>
+        <text class="tl" x="508" y="18" text-anchor="middle">60</text>
+        <text class="tl" x="340" y="348" text-anchor="middle">accuracy drop at severity 5 (percentage points)</text>
+
+        <text class="bl" x="142" y="38.0" text-anchor="end">gaussian noise</text><rect class="b1" x="150" y="30.0" width="420.4" height="10.5" rx="2"/><text class="bv" x="577.4" y="38.5">70.4</text>
+        <text class="bl" x="142" y="53.5" text-anchor="end">contrast</text><rect class="bg" x="150" y="45.5" width="403.4" height="10.5" rx="2"/><text class="bv" x="560.4" y="54.0">67.5</text>
+        <text class="bl" x="142" y="69.0" text-anchor="end">impulse noise</text><rect class="bg" x="150" y="61.0" width="401.0" height="10.5" rx="2"/><text class="bv" x="558.0" y="69.5">67.2</text>
+        <text class="bl" x="142" y="84.5" text-anchor="end">shot noise</text><rect class="bg" x="150" y="76.5" width="388.5" height="10.5" rx="2"/><text class="bv" x="545.5" y="85.0">65.1</text>
+        <text class="bl" x="142" y="100.0" text-anchor="end">gaussian blur</text><rect class="bg" x="150" y="92.0" width="364.3" height="10.5" rx="2"/><text class="bv" x="521.3" y="100.5">61.0</text>
+        <text class="bl" x="142" y="115.5" text-anchor="end">speckle noise</text><rect class="bg" x="150" y="107.5" width="356.8" height="10.5" rx="2"/><text class="bv" x="513.8" y="116.0">59.8</text>
+        <text class="bl" x="142" y="131.0" text-anchor="end">pixelate</text><rect class="bg" x="150" y="123.0" width="313.2" height="10.5" rx="2"/><text class="bv" x="470.2" y="131.5">52.4</text>
+        <text class="bl" x="142" y="146.5" text-anchor="end">glass blur</text><rect class="bg" x="150" y="138.5" width="298.0" height="10.5" rx="2"/><text class="bv" x="455.0" y="147.0">49.9</text>
+        <text class="bl" x="142" y="162.0" text-anchor="end">defocus blur</text><rect class="bg" x="150" y="154.0" width="253.8" height="10.5" rx="2"/><text class="bv" x="410.8" y="162.5">42.5</text>
+        <text class="bl" x="142" y="177.5" text-anchor="end">zoom blur</text><rect class="bg" x="150" y="169.5" width="218.0" height="10.5" rx="2"/><text class="bv" x="375.0" y="178.0">36.5</text>
+        <text class="bl" x="142" y="193.0" text-anchor="end">frost</text><rect class="bg" x="150" y="185.0" width="214.7" height="10.5" rx="2"/><text class="bv" x="371.7" y="193.5">35.9</text>
+        <text class="bl" x="142" y="208.5" text-anchor="end">motion blur</text><rect class="bg" x="150" y="200.5" width="198.0" height="10.5" rx="2"/><text class="bv" x="355.0" y="209.0">33.1</text>
+        <text class="bl" x="142" y="224.0" text-anchor="end">fog</text><rect class="bg" x="150" y="216.0" width="174.1" height="10.5" rx="2"/><text class="bv" x="331.1" y="224.5">29.2</text>
+        <text class="bl" x="142" y="239.5" text-anchor="end">elastic transform</text><rect class="bg" x="150" y="231.5" width="142.1" height="10.5" rx="2"/><text class="bv" x="299.1" y="240.0">23.8</text>
+        <text class="bl" x="142" y="255.0" text-anchor="end">jpeg compression</text><rect class="bg" x="150" y="247.0" width="135.6" height="10.5" rx="2"/><text class="bv" x="292.6" y="255.5">22.7</text>
+        <text class="bl" x="142" y="270.5" text-anchor="end">snow</text><rect class="bg" x="150" y="262.5" width="134.4" height="10.5" rx="2"/><text class="bv" x="291.4" y="271.0">22.5</text>
+        <text class="bl" x="142" y="286.0" text-anchor="end">spatter</text><rect class="bg" x="150" y="278.0" width="126.6" height="10.5" rx="2"/><text class="bv" x="283.6" y="286.5">21.2</text>
+        <text class="bl" x="142" y="301.5" text-anchor="end">saturate</text><rect class="bg" x="150" y="293.5" width="54.0" height="10.5" rx="2"/><text class="bv" x="211.0" y="302.0">9.0</text>
+        <text class="bl" x="142" y="317.0" text-anchor="end">brightness</text><rect class="b3" x="150" y="309.0" width="34.6" height="10.5" rx="2"/><text class="bv" x="191.6" y="317.5">5.8</text>
+      </svg>
+      <figcaption>Noise dominates the top of the ranking; the two corruptions that mainly rescale intensity sit at the bottom. A detector responding to the magnitude of pixel change would rank a strong brightness shift as a major event.</figcaption>
+    </figure>
+
+    <div class="findings">
+      <div class="finding"><b>Severity is not a measure of harm.</b> Four corruption types are non-monotonic: the model scores higher at a nominally worse severity. Seven such transitions appear in the grid; five survive a test against sampling error, led by snow (+5.9 points from severity 2 to 3).</div>
+      <div class="finding"><b>Corruption family does not predict impact either.</b> Glass blur costs 45.9 points at severity 1 while defocus blur costs 0.9 — same family, same label, more than an order of magnitude apart. Weights must be learned from measured image features, not assigned per family.</div>
+      <div class="finding"><b>Scope.</b> Each cell rests on 2,000 images, giving roughly one percentage point of sampling error; differences of that order are not read as real. The full 10,000-image run is pending, as is Stage 2 on real corrupted data.</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
     <p class="kicker">Research questions</p>
     <h2>What the study tests</h2>
     <div class="rqs">
@@ -509,7 +639,7 @@
   </div>
 </section>
 
-<section>
+<section class="alt">
   <div class="wrap">
     <p class="kicker">Expected contribution</p>
     <h2>Three outputs, each useful on its own</h2>
@@ -534,51 +664,41 @@
   </div>
 </section>
 
-<section class="alt">
+<section>
   <div class="wrap">
     <p class="kicker">Progress</p>
     <h2>Deliverables</h2>
     <div class="timeline">
       <div class="ev done"><div class="ev-row">
         <span class="when">16 Oct 2026</span>
-        <span class="what">1-Page Research Statement<a href="docs/DriftWatch_Research_Statement.pdf" download>PDF ↓</a><small>Problem, gap, approach, research question</small></span>
+        <span class="what">Research Statement <span class="wt">4%</span><a href="docs/DriftWatch_Research_Statement.pdf" download>PDF ↓</a><small>One-page research statement in general terms</small></span>
+        <span class="badge">Submitted</span>
+      </div></div>
+      <div class="ev done"><div class="ev-row">
+        <span class="when">13 Nov 2026</span>
+        <span class="what">Progress Report 1 <span class="wt">8%</span><a href="docs/DriftWatch_Progress_Report_1.pdf" download>PDF ↓</a><small>Literature survey: comparative survey of previous work</small></span>
         <span class="badge">Submitted</span>
       </div></div>
       <div class="ev now"><div class="ev-row">
-        <span class="when">Weeks 4–6</span>
-        <span class="what">Literature Review<small>Corruption benchmarks, drift detection, label-free performance estimation</small></span>
+        <span class="when">11 Dec 2026</span>
+        <span class="what">Progress Report 2 <span class="wt">8%</span><small>Proposed method in sufficient detail</small></span>
         <span class="badge">In progress</span>
       </div></div>
       <div class="ev"><div class="ev-row">
-        <span class="when">13 Nov 2026</span>
-        <span class="what">Progress Report 1<small>Title + abstract, introduction, proposed method, references</small></span>
-        <span class="badge">Upcoming</span>
-      </div></div>
-      <div class="ev"><div class="ev-row">
-        <span class="when">11 Dec 2026</span>
-        <span class="what">Progress Report 2<small>Revised sections, experiment design, experiment plan</small></span>
-        <span class="badge">Upcoming</span>
-      </div></div>
-      <div class="ev"><div class="ev-row">
-        <span class="when">Weeks 12–13</span>
-        <span class="what">Experimental Results<small>Robustness profiles, alignment analysis, figures</small></span>
-        <span class="badge">Upcoming</span>
-      </div></div>
-      <div class="ev"><div class="ev-row">
         <span class="when">31 Dec 2026</span>
-        <span class="what">Academic Paper<small>Full write-up of method, experiments and findings</small></span>
+        <span class="what">Final Report <span class="wt">50%</span><small>An academic paper, at conference-paper level, presenting the results of the study</small></span>
         <span class="badge">Upcoming</span>
       </div></div>
       <div class="ev"><div class="ev-row">
         <span class="when">Jan 2027</span>
-        <span class="what">Online Presentation<small>Final defence during the examination period</small></span>
+        <span class="what">Online Presentation <span class="wt">30%</span><small>Conference-style presentation of the performed work</small></span>
         <span class="badge">Upcoming</span>
       </div></div>
     </div>
   </div>
 </section>
 
-<section>
+<section class="alt">
   <div class="wrap">
     <p class="kicker">Feasibility</p>
     <h2>The hardware constraint is a design choice</h2>
@@ -592,7 +712,7 @@
   </div>
 </section>
 
-<section class="alt">
+<section>
   <div class="wrap">
     <p class="kicker">Citation</p>
     <h2>Cite this work</h2>
@@ -600,7 +720,7 @@
   title  = {DriftWatch: Predicting the Performance Degradation of
             Deployed Models from Unlabeled Input Data},
   author = {{\"O}cal, Do{\u{g}}a {\.I}dil},
-  note   = {CMPE 490 Research Statement, supervised by Ay{\c{s}}enur Birt{\"u}rk},
+  note   = {CMPE 490 research project, supervised by Ay{\c{s}}enur Birt{\"u}rk},
   school = {TED University, Department of Computer Engineering},
   year   = {2026}
 }</pre>
