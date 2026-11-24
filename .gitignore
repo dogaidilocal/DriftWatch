@@ -1,7 +1,21 @@
+# Python
+.venv/
 venv/
 __pycache__/
 *.pyc
+
+# Data and weights — large, and obtainable from their published sources.
+# CIFAR-10-C: Zenodo. Clean CIFAR-10: cs.toronto.edu. Checkpoint: see CLAUDE.md.
 data/
-results/*.csv
-figures/*.png
 weights/
+
+# Transfer scratch — chunk files used to move a subsample of CIFAR-10-C onto a
+# machine that could not download it directly. tools/unpack_subsample.py reads
+# these; once unpacked into data/ they can be deleted.
+_transfer/
+_tmp_test.npy
+*.zip
+
+# Results and figures ARE tracked. They are the output of the study, small, and
+# the numbers quoted in the reports and on the site have to be traceable to a
+# committed file.
